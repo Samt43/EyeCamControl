@@ -19,6 +19,7 @@ public class MainMenu {
         System.out.println("1 . Take a photo");
         System.out.println("2 . Take and save photo");
         System.out.println("3 . View parameters");
+        System.out.println("4 . Write file essai.txt in /tmp/fuse_d/MISC/");
         System.out.println("10 . Exit");
         int myint = keyboard.nextInt();
 
@@ -32,6 +33,9 @@ public class MainMenu {
 		case 3:
 			ParametersMenu parametersMenu = new ParametersMenu();
 			parametersMenu.executeView(keyboard,control);
+			break;
+		case 4:
+			control.sendDataToCamera(new String("essai").getBytes(), "/tmp/fuse_d/MISC/essai.txt");
 			break;
 		case 10:
 			exit = true;

@@ -7,8 +7,6 @@ import java.io.IOException;
 
 import org.json.simple.parser.ParseException;
 
-import Client.JSONMessage;
-import Client.JsonClient;
 import Client.RawDataClient;
 
 /**

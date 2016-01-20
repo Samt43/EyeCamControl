@@ -2,6 +2,7 @@ package Client;
 
 import java.io.BufferedReader;
 import java.io.DataInputStream;
+import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -23,8 +24,7 @@ public class RawDataClient extends AbstractTCPClient{
 	public void connect() throws IOException
 	{
 		super.connect();
-        mOut = new OutputStreamWriter(
-			     mSocket.getOutputStream(), StandardCharsets.UTF_8);
+        mOut = new DataOutputStream(mSocket.getOutputStream());
         mIn = new DataInputStream(mSocket.getInputStream());
 	}
 	
@@ -37,7 +37,13 @@ public class RawDataClient extends AbstractTCPClient{
 		return b;
 	}
 
+	public void putData(byte array[]) throws IOException
+	{
+		mOut.write(array);
+		System.out.println(Integer.toString(array.length)+ " bytes have been put successfully !");
+	}
+
 	// getStatus()
-	OutputStreamWriter mOut;
+	DataOutputStream mOut;
 	DataInputStream mIn; 
 }

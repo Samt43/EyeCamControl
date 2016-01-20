@@ -1,7 +1,6 @@
 package Actions;
 
 import Client.JSONMessage;
-import Client.JsonClient;
 
 
 public class ActionGetToken extends AbstractJSONAction {

@@ -46,6 +46,16 @@ public class JSONActionController {
 		return r;
 	}
 	
+	public void sendDataToCamera(byte data[], String outputPath)
+	{
+		ActionPutData a = new ActionPutData(data, outputPath);
+		executeJSONCommand(a);
+		ActionPutRawData p = new ActionPutRawData(data);
+		executeRawDataAction(p);
+		ActionListen listen = new ActionListen();
+		executeJSONCommand(listen);
+	}
+
 	public void TakeAndSavePicture(File file)
 	{
 		ActionTakePicture p = takePicture();

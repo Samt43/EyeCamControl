@@ -6,7 +6,6 @@ import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 
 import Client.JSONMessage;
-import Client.JsonClient;
 import Model.Parameter;
 
 public class ActionGetParameters extends AbstractJSONAction {
