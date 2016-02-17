@@ -16,25 +16,37 @@ public class MainMenu {
     boolean exit = false;
     while (!exit) {
         System.out.println("Enter your choice :");
-        System.out.println("1 . Take a photo");
-        System.out.println("2 . Take and save photo");
-        System.out.println("3 . View parameters");
-        System.out.println("4 . Write file essai.txt in /tmp/fuse_d/MISC/");
+        System.out.println("1 . Start video recording");
+        System.out.println("2 . Stop video recording");
+        System.out.println("3 . Stop recording and save video");
+        System.out.println("4 . Take a photo");
+        System.out.println("5 . Take and save photo");
+        System.out.println("6 . View parameters");
+        System.out.println("7 . Write file essai.txt in /tmp/fuse_d/MISC/");
         System.out.println("10 . Exit");
         int myint = keyboard.nextInt();
 
         switch (myint) {
 		case 1:
-	        control.takePicture();
+	        control.startVideo();
 			break;
 		case 2:
-	        control.TakeAndSavePicture(new File("Picture.jpg"));
+	        control.stopVideo();
 			break;
 		case 3:
+	        control.StopAndSaveVideo(new File("Video.mp4"));
+			break;
+		case 4:
+	        control.takePicture();
+			break;
+		case 5:
+	        control.TakeAndSavePicture(new File("Picture.jpg"));
+			break;
+		case 6:
 			ParametersMenu parametersMenu = new ParametersMenu();
 			parametersMenu.executeView(keyboard,control);
 			break;
-		case 4:
+		case 7:
 			control.sendDataToCamera(new String("essai").getBytes(), "/tmp/fuse_d/MISC/essai.txt");
 			break;
 		case 10:

@@ -24,13 +24,28 @@ public class JSONActionController {
 	public ActionTakePicture takePicture()
 	{
 		ActionTakePicture action = new ActionTakePicture();
-
 		executeJSONCommand(action);
 		
 		
 		return action;
 	}
-	
+
+	public ActionStartVideo startVideo()
+	{
+		ActionStartVideo action = new ActionStartVideo();
+		executeJSONCommand(action);
+
+		return action;
+	}
+
+	public ActionStopVideo stopVideo()
+	{
+		ActionStopVideo action = new ActionStopVideo();
+		executeJSONCommand(action);
+		System.out.println("URL to the file : " + action.getVideoPath());
+		return action;
+	}
+
 	public ActionGetRawData getFile(String path)
 	{
 
@@ -60,24 +75,17 @@ public class JSONActionController {
 	{
 		ActionTakePicture p = takePicture();
 		ActionGetRawData f = getFile(p.getPicturePath());
-		
-		BufferedOutputStream bos = null;
 
-		//create an object of FileOutputStream
-		FileOutputStream fos;
-		try {
-			fos = new FileOutputStream(file);
-			bos = new BufferedOutputStream(fos);
-			bos.write(f.getBytes());
-		} catch (FileNotFoundException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+		save(file,f.getBytes());
 	}
-	
+
+	public void StopAndSaveVideo(File file)
+	{
+		ActionStopVideo a = stopVideo();
+		ActionGetRawData f = getFile(a.getVideoPath());
+		save(file,f.getBytes());
+	}
+
 	public ActionGetParameters getParameters()
 	{
 		ActionGetParameters action = new ActionGetParameters();
@@ -151,6 +159,26 @@ public class JSONActionController {
 		}
 
 	}
+	
+	private void save(File file,byte b[])
+	{
+		BufferedOutputStream bos = null;
+
+		//create an object of FileOutputStream
+		FileOutputStream fos;
+		try {
+			fos = new FileOutputStream(file);
+			bos = new BufferedOutputStream(fos);
+			bos.write(b);
+		} catch (FileNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+	
 	private JsonClient mJSONClient;
 	private RawDataClient mRawDataClient;
 
