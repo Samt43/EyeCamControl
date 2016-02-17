@@ -60,6 +60,20 @@ public class JSONActionController {
 
 		return r;
 	}
+
+	public ActionGetBatteryLevel getBatteryLevel()
+	{
+		ActionGetBatteryLevel a = new ActionGetBatteryLevel();
+		executeJSONCommand(a);
+		return a;
+	}
+
+	public ActionFormatCard formatCard()
+	{
+		ActionFormatCard a = new ActionFormatCard();
+		executeJSONCommand(a);
+		return a;
+	}
 	
 	public void sendDataToCamera(byte data[], String outputPath)
 	{

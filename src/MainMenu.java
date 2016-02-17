@@ -23,6 +23,8 @@ public class MainMenu {
         System.out.println("5 . Take and save photo");
         System.out.println("6 . View parameters");
         System.out.println("7 . Write file essai.txt in /tmp/fuse_d/MISC/");
+        System.out.println("8 . Get Battery Level");
+        System.out.println("9 . Format Card");
         System.out.println("10 . Exit");
         int myint = keyboard.nextInt();
 
@@ -48,6 +50,12 @@ public class MainMenu {
 			break;
 		case 7:
 			control.sendDataToCamera(new String("essai").getBytes(), "/tmp/fuse_d/MISC/essai.txt");
+			break;
+		case 8:
+			System.out.println("Battery Level : " + Integer.toString(control.getBatteryLevel().getBatteryLevel()));
+			break;
+		case 9:
+			control.formatCard();
 			break;
 		case 10:
 			exit = true;
