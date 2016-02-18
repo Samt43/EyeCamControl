@@ -10,11 +10,6 @@ public class ActionGetToken extends AbstractJSONAction {
 		setToken(0);
 	}
 
-	@Override
-	public String getActionName() {
-		return "Get Token...";
-	}
-
 	public int getToken()
 	{
 		System.out.println("Access Token : ");

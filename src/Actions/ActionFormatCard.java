@@ -5,13 +5,8 @@ import Client.JSONMessage;
 
 public class ActionFormatCard extends AbstractJSONAction {
 
-	ActionFormatCard() {
+	public ActionFormatCard() {
 		mJsonMessage.setMessageType(4);
-	}
-
-	@Override
-	public String getActionName() {
-		return "Format Card";
 	}
 
 	@Override

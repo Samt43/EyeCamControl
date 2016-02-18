@@ -43,6 +43,11 @@ public class JsonClient extends AbstractTCPClient{
 		return msg;
 	}
 
+	public boolean isConnected()
+	{
+		return mSocket.isConnected();
+	}
+
 	protected String readJson() throws IOException
 	{
 		String jsonStr = new String();

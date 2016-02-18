@@ -1,72 +1,99 @@
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Scanner;
 
+import Actions.ActionFactory;
+import Actions.ActionGetBatteryLevel;
 import Actions.JSONActionController;
+import Actions.MissingFieldException;
 
 
 public class MainMenu {
 
-	public void executeView(JSONActionController control) throws IOException
-	{
-    System.out.println("Welcome to Eye Cam ! ");
-    
-    Scanner keyboard = new Scanner(System.in);
+	ArrayList<UserChoice> mArrayChoices;
+	final JSONActionController mController;
+	Scanner mInputKeyboard;
 
-    boolean exit = false;
-    while (!exit) {
-        System.out.println("Enter your choice :");
-        System.out.println("1 . Start video recording");
-        System.out.println("2 . Stop video recording");
-        System.out.println("3 . Stop recording and save video");
-        System.out.println("4 . Take a photo");
-        System.out.println("5 . Take and save photo");
-        System.out.println("6 . View parameters");
-        System.out.println("7 . Write file essai.txt in /tmp/fuse_d/MISC/");
-        System.out.println("8 . Get Battery Level");
-        System.out.println("9 . Format Card");
-        System.out.println("10 . Exit");
-        int myint = keyboard.nextInt();
+	public MainMenu(JSONActionController controller, Scanner inputKeyboard) {
+		mController = controller;
+		mInputKeyboard = inputKeyboard;
 
-        switch (myint) {
-		case 1:
-	        control.startVideo();
-			break;
-		case 2:
-	        control.stopVideo();
-			break;
-		case 3:
-	        control.StopAndSaveVideo(new File("Video.mp4"));
-			break;
-		case 4:
-	        control.takePicture();
-			break;
-		case 5:
-	        control.TakeAndSavePicture(new File("Picture.jpg"));
-			break;
-		case 6:
-			ParametersMenu parametersMenu = new ParametersMenu();
-			parametersMenu.executeView(keyboard,control);
-			break;
-		case 7:
-			control.sendDataToCamera(new String("essai").getBytes(), "/tmp/fuse_d/MISC/essai.txt");
-			break;
-		case 8:
-			System.out.println("Battery Level : " + Integer.toString(control.getBatteryLevel().getBatteryLevel()));
-			break;
-		case 9:
-			control.formatCard();
-			break;
-		case 10:
-			exit = true;
-			break;
-		default:
-			break;
-		}
-		
+		mArrayChoices = new ArrayList<UserChoice>();
+		mArrayChoices.add(new UserChoice("Start video recording"){
+			public void execute() throws MissingFieldException
+			{mController.executeJSONCommand(ActionFactory.StartVideo);}});
+
+		mArrayChoices.add(new UserChoice("Stop video recording"){
+			public void execute() throws MissingFieldException
+			{mController.executeJSONCommand(ActionFactory.StopVideo);}});
+
+		mArrayChoices.add(new UserChoice("Stop recording and save video"){
+			public void execute()
+			{mController.StopAndSaveVideo(new File("Video.mp4"));}});
+
+		mArrayChoices.add(new UserChoice("Take a photo"){
+			public void execute() throws MissingFieldException
+			{mController.executeJSONCommand(ActionFactory.TakePicture);}});
+
+		mArrayChoices.add(new UserChoice("Take and save photo"){
+			public void execute()
+			{mController.TakeAndSavePicture(new File("Picture.jpg"));}});
+
+		mArrayChoices.add(new UserChoice("View parameters"){
+			public void execute() throws MissingFieldException
+			{
+				ParametersMenu parametersMenu = new ParametersMenu();
+				parametersMenu.executeView(mInputKeyboard,mController);
+				mController.executeJSONCommand(ActionFactory.GetParameters);}});
+
+		mArrayChoices.add(new UserChoice("Get Battery Level"){
+			public void execute() throws MissingFieldException
+			{
+				ActionGetBatteryLevel a = (ActionGetBatteryLevel) mController.executeJSONCommand(ActionFactory.GetBatteryLevel);
+				System.out.println("Battery Level : " + Integer.toString(a.getBatteryLevel()));
+			}});
+
+		mArrayChoices.add(new UserChoice("Format Card"){
+			public void execute() throws MissingFieldException
+			{mController.executeJSONCommand(ActionFactory.FormatCard);}});
+
+		mArrayChoices.add(new UserChoice("Write file essai.txt in /tmp/fuse_d/MISC/"){
+			public void execute()
+			{mController.sendDataToCamera(new String("essai").getBytes(), "/tmp/fuse_d/MISC/essai.txt");}});
 	}
-    System.out.println("End ! ");
-    keyboard.close();
+
+	public void executeView() throws IOException
+	{
+		System.out.println("Welcome to Eye Cam ! ");
+
+		boolean exit = false;
+		while (!exit) {
+			int choiceNumber = 0;
+			for (UserChoice choice : mArrayChoices) {
+				choiceNumber = choiceNumber+1;
+				System.out.println(Integer.toString(choiceNumber)+". "+choice.getDescription());
+			}
+
+			System.out.println("Enter your choice or press " + Integer.toString(mArrayChoices.size()) + " to exit :");
+			int myint = mInputKeyboard.nextInt();
+			if (0<= myint && myint < mArrayChoices.size())
+			{
+				try {
+					mArrayChoices.get(myint).execute();
+				} catch (MissingFieldException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+			}
+			if (myint == mArrayChoices.size())
+			{
+				exit = true;
+			}
+		}
+
+		System.out.println("End ! ");
+		mInputKeyboard.close();
 
 	}
 }

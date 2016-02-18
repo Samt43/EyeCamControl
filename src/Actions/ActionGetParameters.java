@@ -10,24 +10,9 @@ import Model.Parameter;
 
 public class ActionGetParameters extends AbstractJSONAction {
 
-	ActionGetParameters() {
+	public ActionGetParameters() {
 		mJsonMessage.setMessageType(3);
-		setToken(0);
 	}
-
-	@Override
-	public String getActionName() {
-		return "Get Token...";
-	}
-
-	public int getToken()
-	{
-		System.out.println("Access Token : ");
-		System.out.println(mToken);
-		return mToken;
-	}
-	
-	protected int mToken = -1;
 
 	@Override
 	void parseResponse(JSONMessage msg) {

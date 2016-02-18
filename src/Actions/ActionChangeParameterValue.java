@@ -11,16 +11,9 @@ import Model.Parameter;
 
 public class ActionChangeParameterValue extends AbstractJSONAction {
 
-	ActionChangeParameterValue(String parameterName, String newValue) {
+	public ActionChangeParameterValue() {
 		mJsonMessage.setMessageType(2);
-	    mJsonMessage.setParameter("type", parameterName);
-	    mJsonMessage.setParameter("param", newValue);
 	    success = false;
-	}
-
-	@Override
-	public String getActionName() {
-		return "Change Parameter";
 	}
 
 	@Override
@@ -35,6 +28,14 @@ public class ActionChangeParameterValue extends AbstractJSONAction {
 	public boolean getValueChanged()
 	{
 		return success;
+	}
+
+	public void setParameterName(String name) {
+	    mJsonMessage.setParameter("type", name);
+	}
+
+	public void setParameterValue(String newValue) {
+		mJsonMessage.setParameter("param", newValue);
 	}
 	
 	protected boolean success;

@@ -8,15 +8,10 @@ import Client.JSONMessage;
 
 public class ActionGetParameterValues extends AbstractJSONAction {
 
-	ActionGetParameterValues(String parameterName) {
+	public ActionGetParameterValues(String parameterName) {
 		mParameterName = parameterName;
 		mJsonMessage.setMessageType(9);
 	    mJsonMessage.setParameter("param", parameterName);
-	}
-
-	@Override
-	public String getActionName() {
-		return "Get Parameter";
 	}
 
 	@Override
@@ -36,7 +31,13 @@ public class ActionGetParameterValues extends AbstractJSONAction {
 		return mParameterValues;
 	}
 	
+	public void setParameterName(String name) {
+		mParameterName = name;
+		
+	}
+
 	protected ArrayList<String> mParameterValues = new ArrayList<String>();
 	protected String mParameterName;
+
 
 }

@@ -2,41 +2,50 @@ import java.util.ArrayList;
 import java.util.Scanner;
 
 import Actions.ActionChangeParameterValue;
+import Actions.ActionFactory;
 import Actions.ActionGetParameterValues;
 import Actions.ActionGetParameters;
 import Actions.JSONActionController;
+import Actions.MissingFieldException;
 import Model.Parameter;
 
 
 public class ParametersMenu {
-
+	
 	public void executeView(Scanner keyboard, JSONActionController controller)
 	{
 
 		boolean exit = false;
 		while (!exit) {
-			ActionGetParameters a = controller.getParameters();
-			printParameters(a.getParameters());
-			System.out.println("Enter your choice :");
-			System.out.println("1 . View Specific parameter");
-			System.out.println("10 . Exit");
-			int myint = keyboard.nextInt();
+			ActionGetParameters a;
+			try {
+				a = (ActionGetParameters) controller.executeJSONCommand(ActionFactory.GetParameters);
+				printParameters(a.getParameters());
+				System.out.println("Enter your choice :");
+				System.out.println("1 . View Specific parameter");
+				System.out.println("10 . Exit");
+				int myint = keyboard.nextInt();
 
-			switch (myint) {
-			case 1:
-				System.out.println("Enter the parameter number");
-				int n = keyboard.nextInt();
-				if (n >=0 && n < a.getParameters().size())
-				{
-					viewParameter(a.getParameters().get(n),keyboard,controller);
+				switch (myint) {
+				case 1:
+					System.out.println("Enter the parameter number");
+					int n = keyboard.nextInt();
+					if (n >=0 && n < a.getParameters().size())
+					{
+						viewParameter(a.getParameters().get(n),keyboard,controller);
+					}
+					break;
+				case 10:
+					exit = true;
+					break;
+				default:
+					break;
 				}
-				break;
-			case 10:
-				exit = true;
-				break;
-			default:
-				break;
+			} catch (MissingFieldException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
 			}
+
 		}
 	}
 
@@ -66,7 +75,15 @@ public class ParametersMenu {
 		while (!exit) {
 			System.out.println("Parameter : " + p.toString());
 			System.out.println("Possible values : ");
-			ActionGetParameterValues a = controller.getParameterValues(p.getName());
+			ActionGetParameterValues a = (ActionGetParameterValues) controller.createJSONCommand(ActionFactory.GetParameterValues);
+			a.setParameterName(p.getName());
+
+			try {
+				controller.executeJSONCommand(a);
+			} catch (MissingFieldException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 			
 			printParameterValues(a.getParameters());
 			System.out.println("Enter your choice :");
@@ -93,7 +110,17 @@ public class ParametersMenu {
 	
 	public void changeParameter(Parameter p, String newValue, JSONActionController controller)
 	{
-		ActionChangeParameterValue a = controller.ChangeParameterValue(p.getName(), newValue);
+		ActionChangeParameterValue a = (ActionChangeParameterValue) controller.createJSONCommand(ActionFactory.ChangeParameterValue);
+		a.setParameterName(p.getName());
+		a.setParameterValue(newValue);
+
+		try {
+			controller.executeJSONCommand(a);
+		} catch (MissingFieldException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
 		if (a.getValueChanged())
 		{
 			System.out.println("Success !!");

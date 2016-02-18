@@ -13,17 +13,12 @@ import Model.Parameter;
 
 public class ActionGetFile extends AbstractJSONAction {
 
-	ActionGetFile(String filePath) {
+	public ActionGetFile(String filePath) {
 		mFilePath = filePath;
 		mJsonMessage.setMessageType(1285);
 	    mJsonMessage.setParameter("param", mFilePath);
 	    mJsonMessage.setParameter("offset", 0);
 	    mJsonMessage.setParameter("fetch_size", 0);
-	}
-
-	@Override
-	public String getActionName() {
-		return "Get File";
 	}
 
 	@Override

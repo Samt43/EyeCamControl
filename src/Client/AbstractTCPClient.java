@@ -31,7 +31,11 @@ public abstract class AbstractTCPClient {
 		mSocket.connect(new InetSocketAddress(mAddr, mPort),5000);
 	}
 
-	
+	public boolean isConnected()
+	{
+		return mSocket.isConnected();
+	}
+
 	public void disconnect() throws IOException
 	{
 		System.out.println("Disconnecting from eyeCam...");

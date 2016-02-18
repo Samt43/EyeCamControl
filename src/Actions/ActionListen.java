@@ -18,11 +18,6 @@ public class ActionListen extends AbstractJSONAction {
 	}
 
 	@Override
-	public String getActionName() {
-		return "Listening";
-	}
-
-	@Override
 	void parseResponse(JSONMessage msg) {
 	
 	}

@@ -40,11 +40,6 @@ public class ActionPutData extends AbstractJSONAction {
 	}
 
 	@Override
-	public String getActionName() {
-		return "Upload File";
-	}
-
-	@Override
 	void parseResponse(JSONMessage msg) {
 		
 	}

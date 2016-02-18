@@ -5,10 +5,13 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
 import org.json.simple.parser.ParseException;
+
+import Threads.CameraListener;
 
 import sun.misc.IOUtils;
 
@@ -19,109 +22,83 @@ public class JSONActionController {
 	public JSONActionController(String addr,int port) throws IOException {
 		mJSONClient = new JsonClient(addr, port);
 		mRawDataClient = new RawDataClient(addr, 8787);
-	}
-
-	public ActionTakePicture takePicture()
-	{
-		ActionTakePicture action = new ActionTakePicture();
-		executeJSONCommand(action);
-		
-		
-		return action;
-	}
-
-	public ActionStartVideo startVideo()
-	{
-		ActionStartVideo action = new ActionStartVideo();
-		executeJSONCommand(action);
-
-		return action;
-	}
-
-	public ActionStopVideo stopVideo()
-	{
-		ActionStopVideo action = new ActionStopVideo();
-		executeJSONCommand(action);
-		System.out.println("URL to the file : " + action.getVideoPath());
-		return action;
+		mActionFactory = new ActionFactory();
 	}
 
 	public ActionGetRawData getFile(String path)
 	{
-
+		ActionGetRawData r = null;
 		ActionGetFile actionGet = new ActionGetFile(path);
-		executeJSONCommand(actionGet);
+		try {
+			executeJSONCommand(actionGet);
 
-		ActionGetRawData r = new ActionGetRawData(actionGet.getRemaining_Size());
-		executeRawDataAction(r);
-		
-		ActionListen listen = new ActionListen();
-		executeJSONCommand(listen);
-
+			r = new ActionGetRawData(actionGet.getRemaining_Size());
+			executeRawDataAction(r);
+			
+			ActionListen listen = new ActionListen();
+			executeJSONCommand(listen);
+		} catch (MissingFieldException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		return r;
-	}
-
-	public ActionGetBatteryLevel getBatteryLevel()
-	{
-		ActionGetBatteryLevel a = new ActionGetBatteryLevel();
-		executeJSONCommand(a);
-		return a;
-	}
-
-	public ActionFormatCard formatCard()
-	{
-		ActionFormatCard a = new ActionFormatCard();
-		executeJSONCommand(a);
-		return a;
 	}
 	
 	public void sendDataToCamera(byte data[], String outputPath)
 	{
+		try {
 		ActionPutData a = new ActionPutData(data, outputPath);
 		executeJSONCommand(a);
 		ActionPutRawData p = new ActionPutRawData(data);
 		executeRawDataAction(p);
 		ActionListen listen = new ActionListen();
 		executeJSONCommand(listen);
+		} catch (MissingFieldException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 
 	public void TakeAndSavePicture(File file)
 	{
-		ActionTakePicture p = takePicture();
-		ActionGetRawData f = getFile(p.getPicturePath());
-
-		save(file,f.getBytes());
+		ActionTakePicture p;
+		try {
+			p = (ActionTakePicture) executeJSONCommand(createJSONCommand(ActionFactory.TakePicture));
+			ActionGetRawData f = getFile(p.getPicturePath());
+			save(file,f.getBytes());
+		} catch (MissingFieldException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 
 	public void StopAndSaveVideo(File file)
 	{
-		ActionStopVideo a = stopVideo();
-		ActionGetRawData f = getFile(a.getVideoPath());
-		save(file,f.getBytes());
+		ActionStopVideo a;
+		try {
+			a = (ActionStopVideo) executeJSONCommand(
+					createJSONCommand(ActionFactory.StopVideo));
+			ActionGetRawData f = getFile(a.getVideoPath());
+			save(file,f.getBytes());
+		} catch (MissingFieldException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 
-	public ActionGetParameters getParameters()
+	public AbstractJSONAction executeJSONCommand(String actionName) throws MissingFieldException
 	{
-		ActionGetParameters action = new ActionGetParameters();
-		executeJSONCommand(action);
-		return action;
-	}
-	
-	public ActionGetParameterValues getParameterValues(String param)
-	{
-		ActionGetParameterValues action = new ActionGetParameterValues(param);
-		executeJSONCommand(action);
-		return action;
-	}
-	
-	public ActionChangeParameterValue ChangeParameterValue(String param,String newValue)
-	{
-		ActionChangeParameterValue action = new ActionChangeParameterValue(param,newValue);
-		executeJSONCommand(action);
-		return action;
+		return executeJSONCommand(
+				createJSONCommand(actionName));
+		
 	}
 
-	protected void executeJSONCommand(AbstractJSONAction action)
+	public AbstractJSONAction createJSONCommand(String actionName)
+	{
+		return mActionFactory.buildAction(actionName);
+	}
+
+	public AbstractJSONAction executeJSONCommand(AbstractJSONAction action) throws MissingFieldException
 	{
 		try {
 
@@ -140,6 +117,8 @@ public class JSONActionController {
 	        System.out.println("Exception when parsing response !");
 			e.printStackTrace();
 		}
+
+		return action;
 	}
 	
 	protected void executeRawDataAction(AbstractRawTCPAction a)
@@ -160,6 +139,7 @@ public class JSONActionController {
 	{
 		mJSONClient.connect();
 		mRawDataClient.connect();
+		//mCameraListener.
 	}
 	
 	public void clearRessources()
@@ -195,5 +175,7 @@ public class JSONActionController {
 	
 	private JsonClient mJSONClient;
 	private RawDataClient mRawDataClient;
+	private ActionFactory mActionFactory;
+	private CameraListener mCameraListener;
 
 }

@@ -12,13 +12,8 @@ import Client.JsonClient;
 
 public class ActionTakePicture extends AbstractJSONAction {
 
-	ActionTakePicture() {
+	public ActionTakePicture() {
 		mJsonMessage.setMessageType(769);
-	}
-
-	@Override
-	public String getActionName() {
-		return "Take Picture";
 	}
 
 	@Override
@@ -37,7 +32,7 @@ public class ActionTakePicture extends AbstractJSONAction {
 	}
 	
 	@Override
-	void execute(JsonClient client) throws IOException, ParseException {
+	void execute(JsonClient client) throws IOException, ParseException, MissingFieldException {
 
 		super.execute(client);
 

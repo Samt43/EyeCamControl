@@ -5,13 +5,8 @@ import Client.JSONMessage;
 
 public class ActionGetBatteryLevel extends AbstractJSONAction {
 
-	ActionGetBatteryLevel() {
+	public ActionGetBatteryLevel() {
 		mJsonMessage.setMessageType(13);
-	}
-
-	@Override
-	public String getActionName() {
-		return "Get Token...";
 	}
 
 	public int getBatteryLevel()

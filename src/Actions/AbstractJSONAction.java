@@ -4,6 +4,7 @@
 package Actions;
 
 import java.io.IOException;
+import java.util.ArrayList;
 
 import org.json.simple.parser.ParseException;
 
@@ -20,18 +21,18 @@ public abstract class AbstractJSONAction{
 		mNeedToken = true;
 	}
 
-	public abstract String getActionName();
-
 	public void setToken(int i)
 	{
 		mJsonMessage.setParameter("token", i);
 	}
 
-	void execute(JsonClient client) throws IOException, ParseException {
-        System.out.println("Execute JSON Action "+ getActionName() + "\r\n");
+	void execute(JsonClient client) throws IOException, ParseException, MissingFieldException {
+		checkValidity();
+        System.out.println("Execute JSON Action "+ this.getClass().getName() + "\r\n");
         client.send(mJsonMessage);
-		mJsonResponse = client.getResponse();
-		parseResponse(mJsonResponse);
+        mJsonResponse = client.getResponse();
+        parseResponse(mJsonResponse);
+
 	}
 	
 	boolean needToken()
@@ -39,8 +40,20 @@ public abstract class AbstractJSONAction{
 		return mNeedToken;
 	}
 
+	private void checkValidity() throws MissingFieldException
+	{
+		for (String field : mRequieredFields) {
+			if (!mJsonMessage.containsField(field))
+			{
+				throw new MissingFieldException(field + " is missing");
+				//
+			}
+		}
+	}
+
 	abstract void parseResponse(JSONMessage msg);
 	protected JSONMessage mJsonMessage = new JSONMessage();
 	protected JSONMessage mJsonResponse = new JSONMessage();
+	ArrayList<String> mRequieredFields = new ArrayList<String>();
 	boolean mNeedToken;
 }

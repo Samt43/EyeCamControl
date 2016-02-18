@@ -12,13 +12,8 @@ import Client.JsonClient;
 
 public class ActionStartVideo extends AbstractJSONAction {
 
-	ActionStartVideo() {
+	public ActionStartVideo() {
 		mJsonMessage.setMessageType(513);
-	}
-
-	@Override
-	public String getActionName() {
-		return "Start Video";
 	}
 
 	@Override
@@ -32,7 +27,7 @@ public class ActionStartVideo extends AbstractJSONAction {
 	}
 	
 	@Override
-	void execute(JsonClient client) throws IOException, ParseException {
+	void execute(JsonClient client) throws IOException, ParseException, MissingFieldException {
 
 		super.execute(client);
 

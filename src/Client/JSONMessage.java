@@ -39,6 +39,11 @@ public class JSONMessage extends Message {
 		getJSONObject().put(name, value);
 	}
 
+	public boolean containsField(String field)
+	{
+		return getJSONObject().containsKey(field);
+	}
+
 	public void setParameter(String name, int value)
 	{
 		getJSONObject().put(name, value);

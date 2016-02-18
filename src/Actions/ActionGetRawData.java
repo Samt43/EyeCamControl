@@ -8,13 +8,13 @@ import Client.RawDataClient;
 
 public class ActionGetRawData extends AbstractRawTCPAction {
 
-	ActionGetRawData(int lenght) {
+	public ActionGetRawData(int lenght) {
 		mLenght = lenght;
 	}
 
 	@Override
 	public String getActionName() {
-		return "Get Raw Data...";
+		return "Get_Raw_Data";
 	}
 	
 	public void execute(RawDataClient client) throws IOException, ParseException {

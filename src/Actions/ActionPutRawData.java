@@ -14,7 +14,7 @@ public class ActionPutRawData extends AbstractRawTCPAction {
 
 	@Override
 	public String getActionName() {
-		return "Put Raw Data...";
+		return "Put_Raw_Data";
 	}
 	
 	public void execute(RawDataClient client) throws IOException, ParseException {
