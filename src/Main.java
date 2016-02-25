@@ -1,12 +1,11 @@
-
-
-
-
 import java.io.IOException;
 import java.util.Scanner;
 
-import Actions.JSONActionController;
-import Client.JsonClient;
+import cameraControl.CameraController;
+import cameraControl.tcpActions.TCPControler;
+
+import cameraControl.jsonActions.JSONActionController;
+import ui.MainMenu;
 
 /**
  * 
@@ -18,9 +17,15 @@ import Client.JsonClient;
  */
 public class Main {
     public static void main(String[] args) throws IOException {
-        JSONActionController controller = new JSONActionController("192.168.42.1",7878);
-        controller.initialize();
-        MainMenu menu = new MainMenu(controller, new Scanner(System.in));
+        JSONActionController JSONcontroller = new JSONActionController("192.168.42.1",7878);
+        TCPControler TCPcontroller = new TCPControler("192.168.42.1",8787);
+        
+        CameraController cameraController = new CameraController(JSONcontroller,TCPcontroller);
+        JSONcontroller.initialize();
+        TCPcontroller.initialize();
+
+        MainMenu menu = new MainMenu(cameraController, new Scanner(System.in));
+
         menu.executeView();
     }
     
