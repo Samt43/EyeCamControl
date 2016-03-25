@@ -21,80 +21,15 @@ public class JSONActionController implements ClientObserverInterface{
 	{
 		mJSONActionControllerHandler = callbackHandler;
 	}
-	/*
-	public ActionGetRawData getFile(String path)
-	{
-		ActionGetRawData r = null;
-		ActionGetFile actionGet = new ActionGetFile(path);
-		try {
-			executeJSONCommand(actionGet);
 
-			r = new ActionGetRawData(actionGet.getRemaining_Size());
-			executeRawDataAction(r);
-			
-			ActionListen listen = new ActionListen();
-			executeJSONCommand(listen);
-		} catch (MissingFieldException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		return r;
-	}
-	*/
-	/*
-	public void sendDataToCamera(byte data[], String outputPath)
-	{
-		try {
-		ActionPutData a = new ActionPutData(data, outputPath);
-		executeJSONCommand(a);
-		ActionPutRawData p = new ActionPutRawData(data);
-		executeRawDataAction(p);
-		ActionListen listen = new ActionListen();
-		executeJSONCommand(listen);
-		} catch (MissingFieldException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-	}
-	*/
-	/*
-	public void TakeAndSavePicture(File file)
-	{
-		ActionTakePicture p;
-		try {
-			p = (ActionTakePicture) executeJSONCommand(createJSONCommand(ActionFactory.TakePicture));
-			ActionGetRawData f = getFile(p.getPicturePath());
-			save(file,f.getBytes());
-		} catch (MissingFieldException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-	}
-	*/
-
-	/*
-	public void StopAndSaveVideo(File file)
-	{
-		ActionStopVideo a;
-		try {
-			a = (ActionStopVideo) executeJSONCommand(
-					createJSONCommand(ActionFactory.StopVideo));
-			ActionGetRawData f = getFile(a.getVideoPath());
-			save(file,f.getBytes());
-		} catch (MissingFieldException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-	}*/
-
-	public boolean executeJSONCommand(String actionName, BasicHandler handler) throws MissingFieldException
+	public boolean executeJSONCommand(String actionName, BasicActionHandler handler) throws MissingFieldException
 	{
 		return executeJSONCommand(
 				createJSONCommand(actionName, handler));
 		
 	}
 
-	public AbstractJSONAction createJSONCommand(String actionName, BasicHandler handler)
+	public AbstractJSONAction createJSONCommand(String actionName, BasicActionHandler handler)
 	{
 		AbstractJSONAction a = mActionFactory.buildAction(actionName);
 		a.setHandler(handler);
@@ -185,7 +120,7 @@ public class JSONActionController implements ClientObserverInterface{
 		{
 			AbstractJSONAction a = mActionMap.get(m.getMessageType());
 			mActionMap.remove(type);
-			a.parseResponse(m);
+			a.parseErrorsAndResponse(m);
 
 			System.out.println("mJSONActionControllerHandler.onActionIsCompleted(");
 			mJSONActionControllerHandler.onActionIsCompleted(a);

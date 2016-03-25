@@ -8,14 +8,10 @@ import cameraControl.client.JSONMessage;
 
 public class ActionPutData extends AbstractJSONAction {
 
-	ActionPutData(String name) {
+	public ActionPutData(String name) {
 		super(name);
-		//mOutputFilePath = outputPath;
+
 		mJsonMessage.setMessageType(1286);
-	    mJsonMessage.setParameter("param", mOutputFilePath);
-	    mJsonMessage.setParameter("offset", 0);
-	    //mJsonMessage.setParameter("md5sum", getMd5(arrayToSend));
-	    //mJsonMessage.setParameter("size", arrayToSend.length);
 	}
 	
 	String getMd5(byte[] array)
@@ -40,11 +36,22 @@ public class ActionPutData extends AbstractJSONAction {
 		return hashtext;
 	}
 
+	public void setData(byte[] arrayToSend)
+	{
+	    mJsonMessage.setParameter("offset", 0);
+	    mJsonMessage.setParameter("md5sum", getMd5(arrayToSend));
+	    mJsonMessage.setParameter("size", arrayToSend.length);
+	}
+
+	public void setOutPutFilePath(String filePath)
+	{
+	    mJsonMessage.setParameter("param", filePath);
+		
+	}
 	@Override
+	protected
 	void parseResponse(JSONMessage msg) {
 		
 	}
-
-	protected String mOutputFilePath;
 
 }

@@ -17,7 +17,8 @@ public class ActionFactory {
 	public static String GetParameterValues = "Get_Parameter_Values";
 	public static String ChangeParameterValue = "Change_Parameter_Value";
 	public static String StartSession = "Start_Session";
-
+	public static String PutData = "Put_Data";
+	
 	public ActionFactory() {
 		mAvailableActions = new HashMap<String,Class<?>>();
 		mAvailableActions.put(TakePicture,ActionTakePicture.class);
@@ -30,6 +31,7 @@ public class ActionFactory {
 		mAvailableActions.put(ChangeParameterValue,ActionChangeParameterValue.class);
 		mAvailableActions.put(StartSession,ActionStartSession.class);
 		mAvailableActions.put(GetFile,ActionGetFile.class);
+		mAvailableActions.put(PutData,ActionPutData.class);
 	}
 
 	Map<String,Class<?>> getAvailableActions()

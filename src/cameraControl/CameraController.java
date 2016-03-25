@@ -11,29 +11,45 @@ import cameraControl.client.JSONMessage;
 import cameraControl.jsonActions.AbstractJSONAction;
 import cameraControl.jsonActions.ActionFactory;
 import cameraControl.jsonActions.ActionGetFile;
+import cameraControl.jsonActions.ActionPutData;
+import cameraControl.jsonActions.BasicActionHandler;
 import cameraControl.jsonActions.JSONActionController;
 import cameraControl.jsonActions.JSONActionControllerHandler;
 import cameraControl.jsonActions.MissingFieldException;
 import cameraControl.tcpActions.ActionGetRawData;
-import cameraControl.tcpActions.TCPControler;
+import cameraControl.tcpActions.ActionPutRawData;
+import cameraControl.tcpActions.TCPController;
 
 public class CameraController implements JSONActionControllerHandler {
 	
 	final JSONActionController mJSONController;
-	final TCPControler mTCPController;
+	final TCPController mTCPController;
 	BlockingQueue<AbstractJSONAction> mResponseQueue = new ArrayBlockingQueue<AbstractJSONAction>(1);
 	BlockingQueue<String> mNewPhotoQueue = new ArrayBlockingQueue<String>(999);
+	BlockingQueue<String> mNewVideoQueue = new ArrayBlockingQueue<String>(999);
 
-	public CameraController(JSONActionController jsonController,TCPControler tcpController)
+	public CameraController(JSONActionController jsonController,TCPController tcpController)
 	{
 		mJSONController = jsonController;
 		mTCPController = tcpController;
 		mJSONController.registerHandler(this);
 	}
 
+	public void initialise() throws IOException
+	{
+        mJSONController.initialize();
+        mTCPController.initialize();
+	}
+
+	public void clearRessources()
+	{
+        mJSONController.clearRessources();
+        mTCPController.clearRessources();
+	}
+
 	public void executeBasicCommand(String command)
 	{
-		executeJSONCommand(command,new CameraControllerHandler(this) {
+		executeJSONCommand(command,new CameraControllerHandler() {
 			@Override
 			public void execute(AbstractJSONAction a) {
 			}
@@ -42,9 +58,8 @@ public class CameraController implements JSONActionControllerHandler {
 
 	@Override
 	public void onActionIsCompleted(AbstractJSONAction a) {
-		// TODO Auto-generated method stub
+		// This method is called when we receive a completed action. (listener Thread)
 		try {
-			System.out.println("Put the handler !!!");
 			mResponseQueue.put(a);
 		} catch (InterruptedException e) {
 			// TODO Auto-generated catch block
@@ -60,8 +75,8 @@ public class CameraController implements JSONActionControllerHandler {
 		case "start_video_record":
 
 			break;
-		case "stop_video_record":
-
+		case "video_record_complete":
+			newVideoHaveBeenTaken(m);
 			break;
 		case "photo_taken":
 			newPhotoHaveBeenTaken(m);
@@ -73,13 +88,39 @@ public class CameraController implements JSONActionControllerHandler {
 
 	}
 
-
-	public void TakeAndSavePicture()
+	public void StopVideoRecodingAndSave(final File f)
 	{
-	executeJSONCommand(ActionFactory.TakePicture,new CameraControllerHandler(this) {
+		mNewVideoQueue.clear();
+		executeJSONCommand(ActionFactory.StopVideo,new CameraControllerHandler() {
 		@Override
 		public void execute(AbstractJSONAction a) {
-			mCameraController.GetAndSavePicture(new File("Picture.jpg"));
+			//Wait for the photo to be taken
+			String path;
+			try {
+				path = mNewVideoQueue.take();
+				GetAndSaveFile(path, f);
+			} catch (InterruptedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}});
+	}
+
+	public void TakeAndSavePicture(final File f)
+	{
+		mNewPhotoQueue.clear();
+		executeJSONCommand(ActionFactory.TakePicture,new CameraControllerHandler() {
+		@Override
+		public void execute(AbstractJSONAction a) {
+			//Wait for the photo to be taken
+			String path;
+			try {
+				path = mNewPhotoQueue.take();
+				GetAndSaveFile(path, f);
+			} catch (InterruptedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 		}});
 	}
 
@@ -91,59 +132,73 @@ public class CameraController implements JSONActionControllerHandler {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-
 	}
 
-
-	protected void GetAndSavePicture(final File file) {
+	private void newVideoHaveBeenTaken(JSONMessage m) {
+		String path  = m.getJSONObject().get("param").toString();
 		try {
-			//Wait for the photo to be taken
-			String path = mNewPhotoQueue.take();
-			ActionGetFile a = (ActionGetFile) mJSONController.createJSONCommand(ActionFactory.GetFile, new CameraControllerHandler(this) {
-				@Override
-				public void execute(AbstractJSONAction a) {
-					ActionGetFile aJSON = (ActionGetFile) a;
-					ActionGetRawData f = new ActionGetRawData(aJSON.getTotal_Size());
-					// This action is done synchronously
-					mTCPController.executeAction(f);
-					save(file,f.getBytes());
-				}
-
-				private void save(File file,byte b[])
-				{
-					BufferedOutputStream bos = null;
-
-					//create an object of FileOutputStream
-					FileOutputStream fos;
-					try {
-						fos = new FileOutputStream(file);
-						bos = new BufferedOutputStream(fos);
-						bos.write(b);
-					} catch (IOException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
-					}
-				}
-
-			});
-
-			a.setFilePath(path);
-			executeJSONCommand(a);
+			mNewVideoQueue.put(path);
 		} catch (InterruptedException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}
 
-	protected void DownloadAndSaveFile(File file) {
-		//mTCPController.executeAction()
 
+
+	public void sendDataToCamera(String filePath, final byte[] data)
+	{
+		ActionPutData a = (ActionPutData) mJSONController.createJSONCommand(ActionFactory.PutData, new CameraControllerHandler() {
+			@Override
+			public void execute(AbstractJSONAction a) {
+				ActionPutRawData p = new ActionPutRawData(data);
+
+				// This action is done synchronously
+				mTCPController.executeAction(p);
+				
+			}});
+
+		a.setOutPutFilePath(filePath);
+		a.setData(data);
+		executeJSONCommand(a);
+	}
+	
+	protected void GetAndSaveFile(String path, final File file) {
+		ActionGetFile a = (ActionGetFile) mJSONController.createJSONCommand(ActionFactory.GetFile, new CameraControllerHandler() {
+			@Override
+			public void execute(AbstractJSONAction a) {
+				ActionGetFile aJSON = (ActionGetFile) a;
+				ActionGetRawData f = new ActionGetRawData(aJSON.getTotal_Size());
+				// This action is done synchronously
+				mTCPController.executeAction(f);
+				save(file,f.getBytes());
+			}
+
+			private void save(File file,byte b[])
+			{
+				BufferedOutputStream bos = null;
+
+				//create an object of FileOutputStream
+				FileOutputStream fos;
+				try {
+					fos = new FileOutputStream(file);
+					bos = new BufferedOutputStream(fos);
+					bos.write(b);
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+			}
+
+		});
+
+		a.setFilePath(path);
+		executeJSONCommand(a);
 	}
 
 	protected void onStartVideoRecording() {
 		// TODO Auto-generated method stub
 		System.out.println("Video has been started !");
-
 	}
 
 	protected void NewPhotoHasBeenTaken() {
@@ -151,12 +206,18 @@ public class CameraController implements JSONActionControllerHandler {
 		System.out.println("New Photo has been taken !");
 	}
 
-	protected void executeJSONCommand(String command, CameraControllerHandler mainMenuHandler) {
-		AbstractJSONAction a = mJSONController.createJSONCommand(command, mainMenuHandler);
+	public AbstractJSONAction createJSONCommand(String actionName, BasicActionHandler handler)
+	{
+		AbstractJSONAction a = mJSONController.createJSONCommand(actionName, handler);
+		return a;
+	}
+	
+	public void executeJSONCommand(String command, BasicActionHandler handler) {
+		AbstractJSONAction a = mJSONController.createJSONCommand(command, handler);
 		executeJSONCommand(a);
 	}
 
-	protected void executeJSONCommand(AbstractJSONAction a) {
+	public void executeJSONCommand(AbstractJSONAction a) {
 		// TODO Auto-generated method stub
 		try {
 			mJSONController.executeJSONCommand(a);
@@ -169,6 +230,13 @@ public class CameraController implements JSONActionControllerHandler {
 	}
 
 	private void executeResponse(AbstractJSONAction a) {
-		a.executeCallBack();
+		if (a.success())
+		{
+			a.executeCallBack();
+		}
+		else
+		{
+			a.executeErrorsCallBack();
+		}
 	}
 }

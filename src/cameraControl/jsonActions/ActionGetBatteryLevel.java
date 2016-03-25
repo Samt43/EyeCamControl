@@ -17,6 +17,7 @@ public class ActionGetBatteryLevel extends AbstractJSONAction {
 	protected int mBatteryPourcentage = -1;
 
 	@Override
+	protected
 	void parseResponse(JSONMessage msg) {
 		mBatteryPourcentage = Integer.parseInt(msg.getJSONObject().get("param").toString());
 	}

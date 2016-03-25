@@ -7,21 +7,12 @@ public class ActionChangeParameterValue extends AbstractJSONAction {
 	public ActionChangeParameterValue(String name) {
 		super(name);
 		mJsonMessage.setMessageType(2);
-	    success = false;
 	}
 
 	@Override
+	protected
 	void parseResponse(JSONMessage msg) {
-		Long ret = (Long) msg.getJSONObject().get("rval");
-		if (ret == 0)
-		{
-			success = true;
-		}
-	}
-	
-	public boolean getValueChanged()
-	{
-		return success;
+
 	}
 
 	public void setParameterName(String name) {
@@ -31,7 +22,5 @@ public class ActionChangeParameterValue extends AbstractJSONAction {
 	public void setParameterValue(String newValue) {
 		mJsonMessage.setParameter("param", newValue);
 	}
-	
-	protected boolean success;
 
 }

@@ -1,12 +1,12 @@
 package cameraControl;
 
-import cameraControl.jsonActions.BasicHandler;
+import cameraControl.jsonActions.AbstractJSONAction;
+import cameraControl.jsonActions.BasicActionHandler;
 
-public abstract class CameraControllerHandler implements BasicHandler {
-	CameraControllerHandler(CameraController cameraController)
-	{
-		mCameraController = cameraController;
+public abstract class CameraControllerHandler implements BasicActionHandler {
+	@Override
+	public void executeErrorCallback(AbstractJSONAction abstractJSONAction) {
+		System.out.println("ErrorCallback not implemented");
+		
 	}
-
-	protected CameraController mCameraController;
 }

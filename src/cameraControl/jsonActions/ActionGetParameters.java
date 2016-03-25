@@ -16,6 +16,7 @@ public class ActionGetParameters extends AbstractJSONAction {
 	}
 
 	@Override
+	protected
 	void parseResponse(JSONMessage msg) {
 		JSONArray array = (JSONArray)msg.getJSONObject().get("param");
 		for (Object object : array) {

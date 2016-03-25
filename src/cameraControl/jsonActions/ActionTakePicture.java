@@ -11,11 +11,11 @@ public class ActionTakePicture extends AbstractJSONAction {
 	}
 
 	@Override
+	protected
 	void parseResponse(JSONMessage msg) {
 		// TODO Auto-generated method stub
 
 	}
 
-	
 	protected String mPicturePath = "none";
 }

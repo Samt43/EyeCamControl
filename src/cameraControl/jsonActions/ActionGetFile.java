@@ -13,6 +13,7 @@ public class ActionGetFile extends AbstractJSONAction {
 	}
 
 	@Override
+	protected
 	void parseResponse(JSONMessage msg) {
 		mRemaining_Size = Integer.parseInt(msg.getJSONObject().get("rem_size").toString());
 		mTotal_Size = Integer.parseInt(msg.getJSONObject().get("size").toString());

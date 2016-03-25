@@ -11,6 +11,7 @@ public class ActionFormatCard extends AbstractJSONAction {
 	}
 
 	@Override
+	protected
 	void parseResponse(JSONMessage msg) {
 	}
 }

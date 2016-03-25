@@ -22,7 +22,7 @@ public abstract class AbstractTCPClient {
 		}
 
 		System.out.println("Connecting TCP to eyeCam... : " + mAddr +":"+Integer.toString(mPort));
-		mSocket.connect(new InetSocketAddress(mAddr, mPort),5000);
+		mSocket.connect(new InetSocketAddress(mAddr, mPort),10000);
 	}
 
 	public boolean isConnected()

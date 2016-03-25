@@ -14,13 +14,15 @@ public class CameraListener extends Thread {
 	}
 
 	public void run() {
-		while (mJSONClient.isConnected())
+		while (true)
 		{
 	    try {
 			mJSONClient.getResponse();
 		} catch (IOException | ParseException e) {
 			// TODO Auto-generated catch block
-			e.printStackTrace();
+			System.out.println("Socket have been closed, listener thread will stop");
+			// we exit the thread
+			break;
 		}
 		}
 	}

@@ -6,7 +6,7 @@ import cameraControl.client.RawDataClient;
 
 public class ActionPutRawData extends AbstractRawTCPAction {
 
-	ActionPutRawData(byte array[]) {
+	public ActionPutRawData(byte array[]) {
 		mBytes = array;
 	}
 

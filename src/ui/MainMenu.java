@@ -1,5 +1,6 @@
 package ui;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Scanner;
@@ -22,6 +23,12 @@ public class MainMenu {
 
 		mArrayChoices.add(new UserChoiceBasicCommand("Start video recording",mCameraController,ActionFactory.StartVideo));
 		mArrayChoices.add(new UserChoiceBasicCommand("Stop video recording",mCameraController,ActionFactory.StopVideo));
+		mArrayChoices.add(new UserChoice("Stop video recording and save"){
+			public void execute() throws MissingFieldException
+			{
+				mCameraController.StopVideoRecodingAndSave(new File("video.mp4"));
+			}
+		});
 		mArrayChoices.add(new UserChoiceBasicCommand("Take a photo",mCameraController,ActionFactory.TakePicture));
 		mArrayChoices.add(new UserChoiceBasicCommand("Get Battery Level",mCameraController,ActionFactory.GetBatteryLevel));
 		mArrayChoices.add(new UserChoiceBasicCommand("Format Card",mCameraController,ActionFactory.FormatCard));
@@ -29,30 +36,23 @@ public class MainMenu {
 		mArrayChoices.add(new UserChoice("Take and save photo"){
 			public void execute() throws MissingFieldException
 			{
-				mCameraController.TakeAndSavePicture();
+				mCameraController.TakeAndSavePicture(new File("Picture.jpg"));
+			}
+		});
+		mArrayChoices.add(new UserChoice("Write file essai.txt in /tmp/fuse_d/MISC/"){
+			public void execute() throws MissingFieldException
+			{
+				mCameraController.sendDataToCamera("/tmp/fuse_d/MISC/essai.txt", new String("essai").getBytes());
+			}
+		});
+		mArrayChoices.add(new UserChoice("View, modify parameters"){
+			public void execute() throws MissingFieldException
+			{
+				ParametersMenu m = new ParametersMenu();
+				m.executeView(mInputKeyboard,mCameraController);
 			}
 		});
 	}
-
-			
-
-	/*
-
-		mArrayChoices.add(new UserChoice("Stop recording and save video"){
-			public void execute()
-			{mController.StopAndSaveVideo(new File("Video.mp4"));}});
-
-		mArrayChoices.add(new UserChoice("View parameters",this){
-			public void execute() throws MissingFieldException
-			{
-				ParametersMenu parametersMenu = new ParametersMenu();
-				parametersMenu.executeView(mInputKeyboard,mController);
-				mController.executeJSONCommand(ActionFactory.GetParameters);}});
-		mArrayChoices.add(new UserChoice("Write file essai.txt in /tmp/fuse_d/MISC/"){
-			public void execute()
-			{mController.sendDataToCamera(new String("essai").getBytes(), "/tmp/fuse_d/MISC/essai.txt");}});
-	 */
-
 
 	public void executeView() throws IOException
 	{
@@ -83,7 +83,7 @@ public class MainMenu {
 			}
 		}
 
-		System.out.println("End ! ");
+		System.out.println("Will now disconnect and close ! ");
 		mInputKeyboard.close();
 
 	}

@@ -24,6 +24,7 @@ public class ActionStartSession extends AbstractJSONAction {
 	}
 	
 	@Override
+	protected
 	void parseResponse(JSONMessage msg) {
 		mToken = Integer.parseInt(msg.getJSONObject().get("param").toString());
 		

@@ -18,11 +18,11 @@ import cameraControl.client.JsonClient;
 public abstract class AbstractJSONAction{
 
 	public AbstractJSONAction(String name) {
-		mNeedToken = true;
 		mActionName = name;
+		mErrorsDuringExecution = false;
 	}
 
-	public void setHandler(BasicHandler handler)
+	public void setHandler(BasicActionHandler handler)
 	{
 		mHandler = handler;
 	}
@@ -37,11 +37,6 @@ public abstract class AbstractJSONAction{
         System.out.println("Execute JSON Action "+ this.getClass().getName() + "\r\n");
         client.send(mJsonMessage);
 
-	}
-	
-	boolean needToken()
-	{
-		return mNeedToken;
 	}
 
 	public Integer getType() {
@@ -60,17 +55,59 @@ public abstract class AbstractJSONAction{
 		}
 	}
 
+	public String getActionName()
+	{
+		return mActionName;
+	}
+	
 	public void executeCallBack() {
 		mHandler.execute(this);
 		// TODO Auto-generated method stub
 	}
 
-	abstract void parseResponse(JSONMessage msg);
+	public void executeErrorsCallBack() {
+		System.out.println("Error during execution of " + getActionName());
+		System.out.println("Error returned : " + Long.toString(getErrorCode()));
+		mHandler.executeErrorCallback(this);
+	}
+
+	public void parseErrorsAndResponse(JSONMessage msg)
+	{
+		parseErrors(msg);
+		if (success())
+		{
+			parseResponse(msg);
+		}
+	}
+
+	private void parseErrors(JSONMessage msg) {
+		// TODO Auto-generated method stub
+		long ret = (long) msg.getJSONObject().get("rval");
+		if (ret != 0)
+		{
+			mErrorsDuringExecution = true;
+			mErrorNumber = ret;
+		}
+	}
+
+	public long getErrorCode()
+	{
+		return mErrorNumber;
+	}
+
+	public boolean success()
+	{
+		return !mErrorsDuringExecution;
+	}
+
+	protected abstract void parseResponse(JSONMessage msg);
 	protected JSONMessage mJsonMessage = new JSONMessage();
 	protected JSONMessage mJsonResponse = new JSONMessage();
 	ArrayList<String> mRequieredFields = new ArrayList<String>();
 	boolean mNeedToken;
+	boolean mErrorsDuringExecution;
+	long mErrorNumber = 0;
 	protected String mActionName;
-	BasicHandler mHandler;
+	BasicActionHandler mHandler;
 
 }

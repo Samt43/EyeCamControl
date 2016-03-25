@@ -11,6 +11,7 @@ public class ActionStopVideo extends AbstractJSONAction {
 	}
 
 	@Override
+	protected
 	void parseResponse(JSONMessage msg) {
 		// TODO Auto-generated method stub
 

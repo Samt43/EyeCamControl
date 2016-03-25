@@ -104,6 +104,12 @@ public class JsonClient extends AbstractTCPClient{
 		return jsonStr;
 	}
 
+	@Override
+	public void disconnect() throws IOException
+	{
+		super.disconnect();
+		
+	}
 	// getStatus()
 	OutputStreamWriter mOut;
 	BufferedReader mIn; 
